@@ -3825,11 +3825,11 @@ namespace Server.Network
 
         public IPEndPoint Address { get; set; }
 
-        public ServerInfo(string name, int fullPercent, TimeZone tz, IPEndPoint address)
+        public ServerInfo(string name, int fullPercent, TimeZoneInfo tzi, IPEndPoint address)
         {
             Name = name;
             FullPercent = fullPercent;
-            TimeZone = tz.GetUtcOffset(DateTime.Now).Hours;
+            TimeZone = tzi.GetUtcOffset(DateTime.Now).Hours;
             Address = address;
         }
     }

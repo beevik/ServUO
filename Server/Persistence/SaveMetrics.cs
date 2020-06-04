@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Server
 {
@@ -8,14 +9,14 @@ namespace Server
         private const string PerformanceCategoryName = "ServUO";
         private const string PerformanceCategoryDesc = "Performance counters for ServUO";
 
-        private readonly PerformanceCounter numberOfWorldSaves;
+        private long numberOfWorldSaves;
 
-        private readonly PerformanceCounter itemsPerSecond;
-        private readonly PerformanceCounter mobilesPerSecond;
-        private readonly PerformanceCounter dataPerSecond;
+        private long itemsPerSecond;
+        private long mobilesPerSecond;
+        private long dataPerSecond;
 
-        private readonly PerformanceCounter serializedBytesPerSecond;
-        private readonly PerformanceCounter writtenBytesPerSecond;
+        private long serializedBytesPerSecond;
+        private long writtenBytesPerSecond;
 
         public SaveMetrics()
         {
@@ -75,48 +76,39 @@ namespace Server
                 }
             }
 
-            this.numberOfWorldSaves = new PerformanceCounter(PerformanceCategoryName, "Save - Count", false);
-
-            this.itemsPerSecond = new PerformanceCounter(PerformanceCategoryName, "Save - Items/sec", false);
-            this.mobilesPerSecond = new PerformanceCounter(PerformanceCategoryName, "Save - Mobiles/sec", false);
-            this.dataPerSecond = new PerformanceCounter(PerformanceCategoryName, "Save - Customs/sec", false);
-
-            this.serializedBytesPerSecond = new PerformanceCounter(PerformanceCategoryName, "Save - Serialized bytes/sec", false);
-            this.writtenBytesPerSecond = new PerformanceCounter(PerformanceCategoryName, "Save - Written bytes/sec", false);
-
             // increment number of world saves
-            this.numberOfWorldSaves.Increment();
+            Interlocked.Increment(ref this.numberOfWorldSaves);
         }
 
         public void OnItemSaved(int numberOfBytes)
         {
-            this.itemsPerSecond.Increment();
+            Interlocked.Increment(ref this.itemsPerSecond);
 
-            this.serializedBytesPerSecond.IncrementBy(numberOfBytes);
+            Interlocked.Add(ref this.serializedBytesPerSecond, (long)numberOfBytes);
         }
 
         public void OnMobileSaved(int numberOfBytes)
         {
-            this.mobilesPerSecond.Increment();
+            Interlocked.Increment(ref this.mobilesPerSecond);
 
-            this.serializedBytesPerSecond.IncrementBy(numberOfBytes);
+            Interlocked.Add(ref this.serializedBytesPerSecond, (long)numberOfBytes);
         }
 
         public void OnGuildSaved(int numberOfBytes)
         {
-            this.serializedBytesPerSecond.IncrementBy(numberOfBytes);
+            Interlocked.Add(ref this.serializedBytesPerSecond, (long)numberOfBytes);
         }
 
         public void OnDataSaved(int numberOfBytes)
         {
-            this.dataPerSecond.Increment();
+            Interlocked.Increment(ref this.dataPerSecond);
 
-            this.serializedBytesPerSecond.IncrementBy(numberOfBytes);
+            Interlocked.Add(ref this.serializedBytesPerSecond, (long)numberOfBytes);
         }
 
         public void OnFileWritten(int numberOfBytes)
         {
-            this.writtenBytesPerSecond.IncrementBy(numberOfBytes);
+            Interlocked.Add(ref this.writtenBytesPerSecond, (long)numberOfBytes);
         }
 
         private bool isDisposed;
@@ -126,15 +118,6 @@ namespace Server
             if (!this.isDisposed)
             {
                 this.isDisposed = true;
-
-                this.numberOfWorldSaves.Dispose();
-
-                this.itemsPerSecond.Dispose();
-                this.mobilesPerSecond.Dispose();
-                this.dataPerSecond.Dispose();
-
-                this.serializedBytesPerSecond.Dispose();
-                this.writtenBytesPerSecond.Dispose();
             }
         }
     }

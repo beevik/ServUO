@@ -8,6 +8,10 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 #endregion
 
 namespace Server
@@ -213,11 +217,7 @@ namespace Server
 
             DeleteFiles("Scripts.CS*.dll");
 
-#if !MONO
-            using (CodeDomProvider provider = new Microsoft.CodeDom.Providers.DotNetCompilerPlatform.CSharpCodeProvider())
-#else
             using (CSharpCodeProvider provider = new CSharpCodeProvider())
-#endif
             {
                 string path = GetUnusedPath("Scripts.CS");
 
@@ -241,7 +241,7 @@ namespace Server
                     files = new string[0];
                 }
 
-                CompilerResults results = provider.CompileAssemblyFromFile(parms, files);
+                var results = provider.CompileAssemblyFromFile(parms, files);
 
                 m_AdditionalReferences.Add(path);
 

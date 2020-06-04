@@ -350,15 +350,15 @@ namespace Ultima
 			 * arul:
 			 *	The variable 'dets[6]' represents an offset into the struct that holds an info about players current location.
 			 *	Added not to break functionality with the older clients (I hope).
-			 * 
-			 * The struct looks as follows: 
-			 * 
-			 *  DWORD fLoggedIn; 
+			 *
+			 * The struct looks as follows:
+			 *
+			 *  DWORD fLoggedIn;
 			 *	DWORD Z;
 			 *  DWORD Y;
 			 *	DWORD X;
-			 *	DWORD Facet;  
-			 *  
+			 *	DWORD Facet;
+			 *
 			 */
             if (dets.Length == 7 && dets[6] < 0xFF)
             {

@@ -180,7 +180,7 @@ namespace Server
         /// <summary>
         /// Unused, using this layer makes you invisible to other players. Strange.
         /// </summary>
-        /// 
+        ///
         Reserved_1 = 0x1E,
 
         /// <summary>
@@ -1350,7 +1350,7 @@ namespace Server
         }
 
         /// <summary>
-        ///     Overridable. Adds the "Locked Down & Secure" property to the given <see cref="ObjectPropertyList" />.
+        ///     Overridable. Adds the "Locked Down &amp; Secure" property to the given <see cref="ObjectPropertyList" />.
         /// </summary>
         public virtual void AddSecureProperty(ObjectPropertyList list)
         {
@@ -1541,7 +1541,7 @@ namespace Server
         /// 	{
         /// 		if ( from.Int &gt;= 100 )
         /// 			return true;
-        /// 		
+        ///
         /// 		return base.AllowEquipedCast( from );
         ///  }</code>
         ///     When placed in an Item script, the item may be cast when equiped if the <paramref name="from" /> has 100 or more intelligence. Otherwise, it will drop to their backpack.

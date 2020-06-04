@@ -4,11 +4,13 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RuntimeFrameworkVersion>3.1.4</RuntimeFrameworkVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
     <EnableDefaultCompileItems>True</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GenerateFullPaths>True</GenerateFullPaths>
     <LangVersion>latest</LangVersion>
+    <NoWarn>CS0419,CS1574</NoWarn>
+    <WarningLevel>3</WarningLevel>
   </PropertyGroup>
 
   <ItemGroup>

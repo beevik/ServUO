@@ -100,7 +100,7 @@ namespace Server
 
         public static MultiTextWriter MultiConsoleOut { get; private set; }
 
-        /* 
+        /*
 		 * DateTime.Now and DateTime.UtcNow are based on actual system clock time.
 		 * The resolution is acceptable but large clock jumps are possible and cause issues.
 		 * GetTickCount and GetTickCount64 have poor resolution.
@@ -526,20 +526,15 @@ namespace Server
 
             string dotnet = null;
 
-            if (Type.GetType("Mono.Runtime") != null)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                MethodInfo displayName = Type.GetType("Mono.Runtime").GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
+                dotnet = RuntimeInformation.FrameworkDescription;
 
-                if (displayName != null)
-                {
-                    dotnet = displayName.Invoke(null, null).ToString();
+                Utility.PushColor(ConsoleColor.Yellow);
+                Console.WriteLine($"Core: Unix environment detected ({dotnet})");
+                Utility.PopColor();
 
-                    Utility.PushColor(ConsoleColor.Yellow);
-                    Console.WriteLine("Core: Unix environment detected");
-                    Utility.PopColor();
-
-                    Unix = true;
-                }
+                Unix = true;
             }
             else
             {
@@ -559,7 +554,7 @@ namespace Server
                 dotnet = "MONO/CSC/Unknown";
 
             Utility.PushColor(ConsoleColor.Green);
-            Console.WriteLine("Core: Compiled for " + (Unix ? "MONO and running on {0}" : ".NET {0}"), dotnet);
+            Console.WriteLine("Core: Compiled for " + (Unix ? ".NET Core and running on {0}" : ".NET {0}"), dotnet);
             Utility.PopColor();
 
             if (GCSettings.IsServerGC)
@@ -844,7 +839,7 @@ namespace Server
                         new FileStream(FileName, append ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.Read)))
             {
                 writer.WriteLine(">>>Logging started on {0:f}.", DateTime.Now);
-                //f = Tuesday, April 10, 2001 3:51 PM 
+                //f = Tuesday, April 10, 2001 3:51 PM
             }
 
             _NewLine = true;
