@@ -1,6 +1,7 @@
 #region References
 using Microsoft.Win32;
 using System;
+using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
@@ -215,23 +216,26 @@ namespace Ultima
         public static string LoadDirectory()
         {
             string dir = null;
-            for (int i = knownRegkeys.Length - 1; i >= 0; i--)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                string exePath;
+                for (int i = knownRegkeys.Length - 1; i >= 0; i--)
+                {
+                    string exePath;
 
-                if (Environment.Is64BitOperatingSystem)
-                {
-                    exePath = GetPath(string.Format(@"Wow6432Node\{0}", knownRegkeys[i]));
-                }
-                else
-                {
-                    exePath = GetPath(knownRegkeys[i]);
-                }
+                    if (Environment.Is64BitOperatingSystem)
+                    {
+                        exePath = GetPath(string.Format(@"Wow6432Node\{0}", knownRegkeys[i]));
+                    }
+                    else
+                    {
+                        exePath = GetPath(knownRegkeys[i]);
+                    }
 
-                if (exePath != null)
-                {
-                    dir = exePath;
-                    break;
+                    if (exePath != null)
+                    {
+                        dir = exePath;
+                        break;
+                    }
                 }
             }
             return dir;
