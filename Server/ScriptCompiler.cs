@@ -11,7 +11,8 @@ using System.Text;
 using Microsoft.CSharp;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
+using Microsoft.CodeAnalysis.Emit;
 #endregion
 
 namespace Server
@@ -216,6 +217,88 @@ namespace Server
             }
 
             DeleteFiles("Scripts.CS*.dll");
+
+            /*
+             * NEW CODE BEGIN
+             */
+
+            List<SyntaxTree> trees = new List<SyntaxTree>();
+            foreach (var file in files)
+            {
+                using (var stream = File.OpenRead(file))
+                {
+                    trees.Add(CSharpSyntaxTree.ParseText(SourceText.From(stream), path: file));
+                }
+            }
+
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            var libPath = Path.GetDirectoryName(typeof(int).Assembly.Location);
+            var references = new MetadataReference[]
+            {
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Collections.Concurrent.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Collections.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Collections.NonGeneric.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.ComponentModel.Primitives.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.ComponentModel.TypeConverter.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Console.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Core.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Data.Common.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Data.DataSetExtensions.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Data.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Diagnostics.FileVersionInfo.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Drawing.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Drawing.Primitives.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Globalization.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.IO.Compression.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.IO.Compression.FileSystem.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.IO.Compression.ZipFile.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.IO.FileSystem.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Linq.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Net.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Net.HttpListener.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Net.Mail.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Net.NameResolution.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Net.NetworkInformation.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Net.Primitives.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Net.Sockets.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Net.WebClient.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Private.Uri.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Private.Xml.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Reflection.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Reflection.Emit.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Runtime.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Runtime.Extensions.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Runtime.InteropServices.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Security.Cryptography.Algorithms.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Security.Cryptography.Csp.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Security.Cryptography.Primitives.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Text.RegularExpressions.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Threading.Tasks.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Threading.Tasks.Parallel.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Web.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Xml.dll")),
+                MetadataReference.CreateFromFile(Path.Join(libPath, "System.Xml.ReaderWriter.dll")),
+                MetadataReference.CreateFromFile(Path.Join(assemblyPath, "Server.dll")),
+                MetadataReference.CreateFromFile(Path.Join(assemblyPath, "Ultima.dll")),
+            };
+
+            string dllPath = GetUnusedPath("Scripts.CS");
+            var compilation = CSharpCompilation.Create("Scripts.CS.dll")
+                .WithOptions(new CSharpCompilationOptions(outputKind: OutputKind.DynamicallyLinkedLibrary))
+                .AddReferences(references)
+                .AddSyntaxTrees(trees);
+
+            EmitResult result = compilation.Emit(Path.Combine(Directory.GetCurrentDirectory(), dllPath));
+            foreach (var diag in result.Diagnostics)
+            {
+                Console.WriteLine(diag.ToString());
+            }
+
+            /*
+             * NEW CODE END
+             */
 
             using (CSharpCodeProvider provider = new CSharpCodeProvider())
             {

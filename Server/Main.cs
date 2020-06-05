@@ -212,6 +212,10 @@ namespace Server
 
                 return _BaseDirectory;
             }
+            set
+            {
+                _BaseDirectory = value;
+            }
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -377,6 +381,10 @@ namespace Server
 
             foreach (string a in args)
             {
+                if (Insensitive.Equals(a, "-cwd"))
+                {
+                    BaseDirectory = Directory.GetCurrentDirectory();
+                }
                 if (Insensitive.Equals(a, "-debug"))
                 {
                     Debug = true;
@@ -413,6 +421,7 @@ namespace Server
                 {
                     Console.WriteLine("An Ultima Online server emulator written in C# - Visit https://www.servuo.com for more information.\n\n");
                     Console.WriteLine(System.AppDomain.CurrentDomain.FriendlyName + " [Parameter]\n\n");
+                    Console.WriteLine("     -cwd                Use current working directory as the base directory.");
                     Console.WriteLine("     -debug              Starting ServUO in Debug Mode. Debug Mode is being used in Core and Scripts to give extended inforamtion during runtime.");
                     Console.WriteLine("     -haltonwarning      ServUO halts if any warning is raised during compilation of scripts.");
                     Console.WriteLine("     -h or -help         Displays this help text.");

@@ -1,6 +1,7 @@
 using Server.Items;
 using Server.Mobiles;
 using System;
+using System.Collections;
 
 namespace Server
 {
@@ -113,9 +114,9 @@ namespace Server
             if (to.AddRewardTitle(m_Title))
             {
                 if (m_Title is int)
-                    to.SendLocalizedMessage(1073625, "#" + (int)m_Title); // The title "~1_TITLE~" has been bestowed upon you. 
+                    to.SendLocalizedMessage(1073625, "#" + (int)m_Title); // The title "~1_TITLE~" has been bestowed upon you.
                 else if (m_Title is string)
-                    to.SendLocalizedMessage(1073625, (string)m_Title); // The title "~1_TITLE~" has been bestowed upon you. 
+                    to.SendLocalizedMessage(1073625, (string)m_Title); // The title "~1_TITLE~" has been bestowed upon you.
 
                 to.AddCollectionPoints(collection.CollectionID, (int)Points * -1);
             }
